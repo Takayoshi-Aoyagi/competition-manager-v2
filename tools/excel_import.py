@@ -11,12 +11,14 @@ LIB_DIR = os.path.join(BASE_DIR, 'lib')
 sys.path.append(LIB_DIR)
 from excel_infile_reader import ExcelInfileReader
 from excel_entrant_sheet_writer import ExcelEntrantSheetWriter
+from merger import Marger
 
 class ExcelImport:
 
-    def __init__(self, input_dir, out_file):
+    def __init__(self, input_dir, out_file, merge=None):
         self.input_dir = input_dir
         self.out_file = out_file
+        self.merge = merge
 
     def _get_files(self):
         files = []
@@ -40,14 +42,30 @@ class ExcelImport:
 
     def execute(self):
         entrants = self.get_entrants()
+        if self.merge is not None:
+            entrants = Marger.merge(entrants, self.merge)
         writer = ExcelEntrantSheetWriter(entrants)
         writer.write(self.out_file)
-        
+
+def get_merge_configs(merge_strs):
+    confs = []
+    for s in merge_strs:
+        arr = s.split(':')
+        conf = {
+            'event': arr[0],
+            'new_name': arr[1],
+            'names': map(lambda x: x.decode('utf-8'), arr[2].split(','))
+            }
+        confs.append(conf)
+    return confs
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('input_dir')
     parser.add_argument('out_file')
+    parser.add_argument('--merge', action='append')
     args = parser.parse_args()
-
-    ei = ExcelImport(args.input_dir, args.out_file)
+    merge_configs = get_merge_configs(args.merge)
+    
+    ei = ExcelImport(args.input_dir, args.out_file, merge_configs)
     ei.execute()
