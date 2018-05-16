@@ -4,13 +4,33 @@ import collections
 
 from excel_writer import ExcelWriter
 
+class EntrantSheet:
+
+    @staticmethod
+    def get_column_defs():
+        keys = (
+            ('id', 'ゼッケン'),
+            ("name", '氏名'),
+            ("kana", 'ふりがな'),
+            ("gender", '性別'),
+            ("grade", '級・段'),
+            ("dojo", '道場'),
+            ("tul", 'トゥル'),
+            ("massogi", 'マッソギ'),
+            ("special", 'スペシャル'),
+            ("fname", 'ファイル名')
+        )
+        return keys
+
 class ExcelEntrantSheetWriter:
 
     def __init__(self, entrants):
         self.entrants = entrants
+        self.column_defs = EntrantSheet.get_column_defs()
+        self.header = map(lambda x: x[1], self.column_defs)
 
     def _get_all_entrant_row_data(self, entrant):
-        keys = ("name", "grade", "dojo", "tul", "massogi", "special", "kana", "fname")
+        keys = map(lambda x: x[0], self.column_defs)
         row = []
         for key in keys:
             row.append(entrant[key])
@@ -18,6 +38,7 @@ class ExcelEntrantSheetWriter:
 
     def _create_sheet_data(self, entrants):
         rows = []
+        rows.append(self.header)
         for entrant in entrants:
             row = self._get_all_entrant_row_data(entrant)
             rows.append(row)
@@ -25,6 +46,7 @@ class ExcelEntrantSheetWriter:
 
     def _get_uniq_data(self, column_name):
         keys = list(set(map(lambda x: x[column_name], self.entrants)))
+        keys = filter(lambda x: x is not None, keys)
         keys.sort()
         return keys
     

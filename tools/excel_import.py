@@ -34,6 +34,8 @@ class ExcelImport:
             reader = ExcelInfileReader(file_path)
             _entrants = reader.read()
             entrants.extend(_entrants)
+        for i, e in enumerate(entrants):
+            e['id'] = i + 1
         return entrants
 
     def execute(self):

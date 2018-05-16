@@ -7,8 +7,8 @@ class ExcelWriter:
     def __init__(self, file_path):
         self.file_path = file_path
         self.wb = openpyxl.Workbook()
-        s0 = self.wb['Sheet']
-        self.wb.remove(s0)
+        for sheet in self.wb.worksheets:
+            self.wb.remove(sheet)
 
     def _create_row(self, sheet, row_index, row):
         col_indexes = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
