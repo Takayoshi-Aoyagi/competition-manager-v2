@@ -49,6 +49,8 @@ class ExcelImport:
 
 def get_merge_configs(merge_strs):
     confs = []
+    if merge_strs is None:
+        return confs
     for s in merge_strs:
         arr = s.split(':')
         conf = {
